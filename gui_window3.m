@@ -126,10 +126,13 @@ uicontrol('style','text','position',[210 620 70 15],'string','Stim.Shape2','Hori
 figUIobj.shape2=uicontrol('style','popupmenu','position',[210 600 85 20],'string',[{'Rect'},{'Circle'}],'callback','sobj.shape2 = sobj.shapelist{get(figUIobj.shape2,''value''),1};');
 set(figUIobj.shape2, 'value', 2);
 
+%個別にパラメタを合わせるよりも，一括であわせるスクリプト呼ぶようにした
+uicontrol('string','Match S2 & S1','position',[300,595 100, 30],'callback','match_stim2cond','Horizontalalignment','center');
+
 uicontrol('style','text','position',[210 575 60 15],'string','Stim.Lumi2','Horizontalalignment','left');
 figUIobj.stimlumi2=uicontrol('style','edit','position',[210 550 50 25],'string',sobj.stimlumi2,'callback','sobj.stimlumi2 = re_write(figUIobj.stimlumi2);check_lumi2','BackGroundColor','w');
 %Match を押すと Stim.lumi1 のサイズにそろえる
-uicontrol('string','Match','position',[270 545 60 30],'callback','set(figUIobj.stimlumi2,''string'',get(figUIobj.stimlumi,''string''));sobj.stimlumi2 = sobj.stimlumi;check_lumi2','Horizontalalignment','center');
+%uicontrol('string','Match','position',[270 545 60 30],'callback','set(figUIobj.stimlumi2,''string'',get(figUIobj.stimlumi,''string''));sobj.stimlumi2 = sobj.stimlumi;check_lumi2','Horizontalalignment','center');
 
 uicontrol('style','text','position',[210 525 85 15],'string','Stim.Duration2','Horizontalalignment','left');
 figUIobj.flipNum2=uicontrol('style','edit','position',[210 500 30 25],'string',sobj.flipNum2,'callback','sobj.flipNum2 = re_write(figUIobj.flipNum2);check_duration2;','BackGroundColor','w');
@@ -147,7 +150,7 @@ uicontrol('style','text','position',[210 425 105 15],'string','Stim.Size2 (Diami
 figUIobj.size2=uicontrol('style','edit','position',[210 400 50 25],'string','1','callback','sobj.stimsz2 = stim_size(sobj.MonitorDist,figUIobj.size2 );','BackGroundColor','w');
 uicontrol('style','text','position',[265 400 25 15],'string','deg','Horizontalalignment','left');
 %Match を押すと Stim.Size1 のサイズにそろえる
-uicontrol('string','Match','position',[295 395 60 30],'callback','set(figUIobj.size2,''string'',get(figUIobj.size,''string''));sobj.stimsz2 = sobj.stimsz;','Horizontalalignment','center');
+%uicontrol('string','Match','position',[295 395 60 30],'callback','set(figUIobj.size2,''string'',get(figUIobj.size,''string''));sobj.stimsz2 = sobj.stimsz;','Horizontalalignment','center');
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%              Electrophysiology             %%%%%%%%%%%%%%%%%%

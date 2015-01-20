@@ -34,7 +34,6 @@ if (sobj.duration*1000 + sobj.delayPTB*1000 > recobj.rect) || (sobj.duration2*10
     recobj.rect = 2000; %ms
     set(figUIobj.rect, 'string', 2000);
     
-    %check_duration2;
-   
+    check_duration2;
 end
 
