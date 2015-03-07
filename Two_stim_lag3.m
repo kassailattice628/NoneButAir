@@ -4,7 +4,7 @@ global sobj
 sobj.position_cord2 = position_polar2(i, sobj.shiftDir);
 
 %%%
-pause(0.01)
+%pause(0.01)
 trigger_AIFV
 
 %Make OffscreenTexture

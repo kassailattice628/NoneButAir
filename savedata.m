@@ -50,14 +50,25 @@ HEADER(34:35,1) = [sobj.tPTBon2; sobj.tPTBoff2];
 HEADER(36:37,1) = sobj.stimsz2';
 HEADER(38,1) = sobj.MonitorDist; %distance from an eye to the dispaly.
 HEADER(39,1) = get(figUIobj.stimRGB,'value');
-%HEADER(40,1)　は上で設定
+%HEADER(40,1)　は Image #上で設定
+
+%%%%%%
+%AO pulse info
+HEADER(41,1) = recobj.pulseDuration;%pulse duration (ms)
+HEADER(42,1) = recobj.pulseDelay;%pulse delay (ms)
+HEADER(43,1) = recobj.pulseAmp;%step start (nA or mV)
+
+%%%%%%
+% NBA version
+HEADER(50,1) = recobj.NBAver;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %     save data 作成
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 savetype = get(figUIobj.savech,'value');
 if savetype ==1%save header& Elech & Photo data
-    save_data = [HEADER;recobj.dataall(:,recobj.plot);recobj.dataall(:,3)];
+    %save_data = [HEADER;recobj.dataall(:,recobj.plot);recobj.dataall(:,3)];
+    save_data = [HEADER;recobj.dataall(:,1);recobj.dataall(:,2);recobj.dataall(:,3)];% V-I + photo 保存(stim pulse も確認できる）
 elseif savetype ==2%save header only
     HEADER(2) = 0;
     save_data = HEADER;

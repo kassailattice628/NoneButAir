@@ -1,5 +1,4 @@
-function main_looping
-
+function main_loopingtest
 global recobj
 global figUIobj
 global sobj
@@ -18,52 +17,23 @@ if floop == 0;% Loop-Out
     sobj.Dir8 = randperm(8);
     sobj.Dir16 = randperm(16);
 elseif floop == 1;%Looping
-    %%%% Loop Error %%%%
-    %{
-    if sobj.shiftDir >= 9 && get(figUIobj.mode,'value') == 1
-        errordlg('Randome Direction can be used in the fixed position mode!!.');
-        set(figUIobj.shiftDir, 'value', 1);
-        sobj.shiftDir = 1;
-        set(figUIobj.loop, 'value',0);
-        set(figUIobj.loop, 'string', 'Loop-Out','BackGroundColor','r');
-        set(figUIobj.stim, 'string','OFF','BackGroundColor','r');
-        return;
-    end
-    %}
-    %%%%%  check save file name  %%%%%
-    ch_save
-    %%%%%%%%%%%%%%%%%%%%%%
+    tic
+    ch_save;%  check save file name  %%%%%
+    set(figUIobj.loop,'string','Looping','BackGroundColor','g');
+    daqsetting;
     
     %%%%%  main looping  %%%%%
-    set(figUIobj.loop,'string','Looping','BackGroundColor','g');
+    
     while floop == 1
         try %error check
-            %{
-%%%%%%%%%TTT%MacTest用５サイクル回ったらストップして Screen close
-        if recobj.cycleNum == 1
-            if sobj.ScrNum == 0;
-                [sobj.wPtr, RECT] = Screen('OpenWindow', sobj.ScrNum,sobj.bgcol);
-            end
-        elseif recobj.cycleNum == 6
-            Screen('CloseAll');
-            stimset;
-            set(figUIobj.loop,'string','Loop-Out','BackGroundColor','r')
-            set(figUIobj.loop,'value',0);
-            set(figUIobj.stim,'string','OFF')
-            set(figUIobj.stim,'value',0);
-            break;
-        end
-        CounterTest = CounterTest + 1;
-%%%%%%%%%%%%%%%%%%
-            %}
-            startBackground(s);
-            %%%%%%%%%%%%%%%%%%%%%%%
             recobj.cycleNum = recobj.cycleNum +1;
-            
-            if fstim == 1%%visual stimlus ON
+            %%%%%%%%%%%%%%%%%%
+            prepAOdata;%AO data 2ch を準備して queue
+            %%%%%
+            startBackground(s); %wait trigger for recording
+            %%%%%%%%%%%%%%%%%%%%%%%
+            if fstim == 1%visual stim ON
                 visual_stimulus;
-                
-                %%% Timinig Mesure %%%
                 recobj.tRec = sobj.vbl_1- recobj.RecStartTime; %Absolute time
                 sobj.tPTBon = sobj.vbl_2 - sobj.vbl_1;
                 sobj.tPTBoff = sobj.vbl_3 -  sobj.vbl_1;
@@ -71,11 +41,8 @@ elseif floop == 1;%Looping
                     sobj.tPTBon2 = sobj.vbl2_2 - sobj.vbl_1;
                     sobj.tPTBoff2 = sobj.vbl2_3 - sobj.vbl_1;
                 end
-                
-            elseif fstim == 0%% visual stimulus OFF, Elechtorichal Rec Only
-                %pause(0.001);
+            elseif fstim == 0;%visual stimulus OFF, Elechtorichal Rec Only
                 trigger_AIFV;
-                
                 recobj.tRec = toc(recobj.STARTloop);
                 recobj.TTL2 = 0;
                 sobj.tPTBon = 0;
@@ -88,44 +55,38 @@ elseif floop == 1;%Looping
                 sobj.stim2_center = zeros(1,2);
                 sobj.dist_pix = 0;
             end
-            
-            %preview data はどうするか？
-            %prevdata;<- いれるならこのあたり
-            
             %%%%%%%%%%%%%%%%%
             %%%%%  data get   %%%%%
             %%%%%%%%%%%%%%%%%
-            recobj.dataall = getdata(daq.ai)*1000;% mV
-            
+            % data は RecPlotData の中で recobj.dataall に入るようになってる
+            % savedata を作る前に interval とる必要あり（？）
+            s.wait(recobj.rect*2/1000);
+            %wait(s,recobj.rect/1000);
+            drawnow update
+            %%%%%%%%%%%%%%%%%
+            %%%%%  set save data  %%%%%
+            %%%%%%%%%%%%%%%%%
+            savedata;
             %%%%%%%%%%%%%%%%%
             %%%%%   reset trigger   %%%%
             %%%%%%%%%%%%%%%%%
             outputSingleScan(sTrig,[0,0]); %trigger reset
-            
-            %%%%%%%%%%%%%%%%%
-            %%%%%  data save  %%%%%
-            %%%%%%%%%%%%%%%%%
-            savedata;
-            
-            %%%%%%%%%%%%%%%%%
-            %%%%%   data plot   %%%%%
-            %%%%%%%%%%%%%%%%%
-            plot_data;
-            
-            %%%%%%%%%%%%%%%%
-            % ここで interval とる必あり？
+            stop(s)
             pause(recobj.interval);
+            floop = get(figUIobj.loop,'value');
         catch ME1
+            %PTB error
             Screen('CloseAll');
             rethrow(ME1);
         end
+        disp(['#: ',num2str(recobj.cycleNum)])
     end %%% Loop END %%%
+    
     
     %%% Reset Cycle Num %%%
     recobj.cycleNum = 0- recobj.prestim;
     disp(['Loop-Out:', num2str(recobj.cycleNum)]);
     sobj.stimsz = stim_size(sobj.MonitorDist,figUIobj.size); %Random size の後 size を戻す
     sobj.stimsz2 = stim_size(sobj.MonitorDist,figUIobj.size2);
-    wait(s, 20)
     clear recobj.STARTloop;
 end

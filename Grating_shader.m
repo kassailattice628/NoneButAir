@@ -93,7 +93,7 @@ draw_tex(tex_id, sRect, ang, color_stim, phase, freq, sc, contrast);
 %%
 %photo sensor 用
 Screen('FillRect', sobj.wPtr, 255, [0 0 40 40]);
-pause(0.001) %これがないと動かない？？？
+%pause(0.001) %これがないと動かない？？？
 trigger_AIFV;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if recobj.delayTTL2/1000 <= sobj.delayPTB %TTL2 の後 stim

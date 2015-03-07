@@ -13,7 +13,7 @@ sobj.position_cord2 = position_polar2(i,sobj.shiftDir);
 sobj.position_cord = sobj.position_cord2;
 
 %%%%%%%%%%%%%%%%
-pause(0.001)%ないと trigger できない？（いらない）
+%pause(0.001)%ないと trigger できない？（いらない）
 %Rec start, Rec Time;
 trigger_AIFV
 %%%%%%%%%%%%%%%

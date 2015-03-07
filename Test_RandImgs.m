@@ -42,7 +42,7 @@ y2 = sobj.pos(2,sobj.X(i))+size(imgdata,2)/2;
 sobj.position_cord = [x1,y1,x2,y2];
 
 %%%%%%%%%%%%%%%%
-pause(0.001)%ないと trigger できない？（いらない）
+%pause(0.001)%ないと trigger できない？（いらない）
 %Rec start, Rec Time;
 trigger_AIFV
 %%%%%%%%%%%%%%%

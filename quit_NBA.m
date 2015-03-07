@@ -1,14 +1,15 @@
 function quit_NBA
 global sobj
-global daq
+global s
+global sTrig
+
+delete(s)
+delete(sTrig)
+daq.reset;
 
 if sobj.ScrNum ~= 0
-Screen('Close', sobj.wPtr);
-delete(daq.ai);
-%delete daq.ao
-putvalue(daq.dio,[0 0]);
-delete(daq.dio);
-clear daq;
-daqreset;
+    Screen('Close', sobj.wPtr);
 end
+
+%clear
 close all;

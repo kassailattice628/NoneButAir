@@ -1,8 +1,9 @@
-function TTLLoop
+function TTLLoop2
 global ui
 
-if get(ui.onloop,'value')==1
+switch get(ui.onloop,'value')
+    case 1
     set(ui.onloop,'string','Loop','BackGroundColor','g');
-else
+    case 0
     set(ui.onloop,'string','Loop-off','BackGroundColor','w');
 end

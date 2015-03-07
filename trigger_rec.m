@@ -1,5 +1,5 @@
 function y = trigger_rec(i)
-global daq
+global sTrig
 global recobj
 global sobj
 if i == 1;
@@ -11,6 +11,6 @@ elseif i == 3
 end
 
 if sobj.ScrNum ~= 0
-    putvalue(daq.dio, dtrig); 
+    outputSingleScan(sTrig, dtrig);
 end
 y = toc(recobj.STARTloop);

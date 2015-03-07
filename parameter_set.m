@@ -1,7 +1,16 @@
 %parameter settings;
 global sobj
 global recobj
-global daq
+global dev
+global s
+global sTrig
+global InCh
+global OutCh
+global lh
+
+global sRot
+%% NBA version
+recobj.NBAver = 10;
 
 %% 電気記録と記録サイクル関係
 recobj.interval = 1; %loop interval(s);
@@ -11,23 +20,34 @@ recobj.rect = 2*1000; %recording time (1s<-1000ms)
 recobj.recp = recobj.sampf*recobj.rect/1000;
 recobj.rectaxis = (0:recobj.sampt/1000:(recobj.recp-1)/recobj.sampf*1000)';%time axis (ms)
 
-recobj.prevt = 500; %preview time (200ms)
+
 recobj.plot = 1; %V/I plot, 1: V plot, 2: I plot
 recobj.yaxis = 1;%1: fix y axis, 2: auto
-recobj.prevp = (recobj.sampf*recobj.prevt/1000)-1;
-recobj.prevtaxis = (0:recobj.sampt/1000:(recobj.prevp-1)/recobj.sampf*1000)'; %time axis (ms)
-recobj.gain_list ={'[-10, 10 (V)]';'[-1, 1 (V)]';'[-200, 200 (mV)]';'[-100, 100 (mV)]'};
-recobj.gain_range = recobj.gain_list{3};
+recobj.yrange = [-100, 30, -5, 3];%[Vmin, Vmax, Cmin, Cmax]
 
 recobj.prestim = 2; % recobj.prestim * recobj.rect (ms) は 刺激なしの blank loop
 
 recobj.fopenflag = 0;
-recobj.dataall =[];
 
-% DAQ関係
-daq.devMaker = 'nidaq';
-daq.devName = 'Dev4';
+%
+recobj.dataall = zeros(recobj.recp,3);%AI channel ３つ分
 
+%elec stim
+recobj.EOf = 0;
+recobj.OutData = zeros(recobj.recp,2); %矩形波データ
+recobj.pulseAmp = 0.1; %刺激amp(nA)
+recobj.pulseDelay = 0.2; %sec
+recobj.pulseDuration = 0.2; %sec
+
+%step
+%recobj.stepVC = [0,100,10;0,0.5,0.1];%[Vstart,Vend,Vstep;Cstart,Cend,Cstep]; (mV) and (nA)
+recobj.stepCV = [0,0.5,0.1;0,100,10];%[Cstart,Cend,Cstep;Vstart,Vend,Vstep]; (nA) and (mV)
+recobj.stepAmp = 0:0.1:0.5;%Cstep
+
+%DAQoutput gain Axoclamp2B, head stage gain (H) = *0.1
+%[(current pulse gain:ME1 cmd output(10*H nA/V)), (voltage pulse gain)]:
+%[1V 入れると 20 mV(=0.02V)出る
+recobj.gain = [1, 0.05]; %for Axoclamp2B Command V output, [ME1 cmd output(10*H nA/V), VC cmd output(20 mV/V)]; % 
 
 %% PTB関係
 %scrsz=get(0,'ScreenSize');
@@ -40,7 +60,9 @@ else
     sNum = sobj.ScrNum;
 end
 %%
-sobj.ScreenSize = [MP(sNum,3)-MP(sNum,1)+1, MP(sNum,4)-MP(sNum,2)+1];%monitor size of stim monitor
+%sobj.ScreenSize = [MP(sNum,3)-MP(sNum,1)+1, MP(sNum,4)-MP(sNum,2)+1];%monitor size of stim monitor
+sobj.ScreenSize = [MP(sNum,3),MP(sNum,4)];%for Windows8
+% monitor にあわせる．DeLL 19 inch の場合
 sobj.pixpitch = 0.264;%(mm)
 sobj.MonitorDist = 300;%(mm) = distance from moniter to eye, => sobj.MonitorDist*tan(1*2*pi/360)/sobj.pixpitch でpixel/degree
 
@@ -119,3 +141,44 @@ check_zoom;
 sobj.img_i = 0;
 sobj.ImageNum = 256;
 sobj.list_img = 1:sobj.ImageNum;
+
+%% Session Based DAQ 
+dev = daq.getDevices;
+s = daq.createSession(dev.Vendor.ID);
+
+s.Rate = recobj.sampf;
+s.DurationInSeconds = recobj.rect/1000;%sec %outputchannel いれると なくなる．
+s.NotifyWhenDataAvailableExceeds = recobj.recp;
+
+InCh = addAnalogInputChannel(s, dev.ID, 0:2, 'Voltage');%(1):Vm, (2):Im, (3):photo sensor
+InCh(1).TerminalConfig = 'Differential';%SingleEnded から Differential に変更した．
+InCh(2).TerminalConfig = 'Differential';
+InCh(3).TerminalConfig = 'Differential';
+
+
+OutCh = addAnalogOutputChannel(s, dev.ID, 0:1,'Voltage');
+%(1):Curretn Pulse (C clamp)
+%(2):Voltage Pulse (V clamp)
+
+% P0.0 is Trigger source, PFI0 is Trigger Destination.
+addTriggerConnection(s,'External',[dev.ID,'/PFI0'],'StartTrigger');
+s.Connections(1).TriggerCondition = 'RisingEdge';
+% generate event listener for Background recording
+lh = addlistener(s, 'DataAvailable', @RecPlotData);
+stop(s)
+
+%% for digital Trigger
+sTrig = daq.createSession(dev.Vendor.ID);
+addDigitalChannel(sTrig, dev.ID, 'port0/line0:1', 'OutputOnly');
+outputSingleScan(sTrig,[0,0]); %reset trigger signals at Low
+%% for Rotary Encoder
+sRot = daq.createSession(dev.Vendor.ID);
+addDigitalChannel(sRot, 'Dev2', 'port0/line3', 'OutputOnly'); %5V 電源の確保
+outputSingleScan(sRot, 1); %reset trigger signals at Low
+
+%Counter channel の 生成
+RotCh = addCounterInputChannel(sRot, 'Dev2', 'ctr0', 'Position');
+RotCh.EncoderType='X4'; %デコーディング方式 X1, X2, X4 が選べるが X4 が一番感度が高くなるので
+addAnalogInputChannel(sRot, 'Dev2', 3, 'Voltage');% AI0:2 は Vm, Im, Photo, AI3 をエンコーダに
+sRot.Rate = 1000;%チャンネルごとに sampling rate かえられるのかな？
+sRot.DurationInSeconds = recobj.rect/1000;

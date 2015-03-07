@@ -3,22 +3,22 @@
 %%%%%%%%%%%%%%%%%%%%%
 % visual stimlus controller and recording elechtrical data
 
-clear all;
+clear;
 close all;
-
+%% Reset DAQ
+daq.reset
+%%
 global sobj
 global recobj
 global figUIobj
-global daq
+global floop
 
 %% parameter setting
+floop=1;
 parameter_set;
 
 %% cycle number counter set 0
 recobj.cycleNum = 0 - recobj.prestim; %loop cycle number
-
-%% daq setting
-daq_initialize(daq.devMaker, daq.devName);
 
 %% open Window PTB %%
 [sobj.wPtr, sobj.RECT] = Screen('OpenWindow', sobj.ScrNum,sobj.bgcol);
@@ -30,6 +30,7 @@ if sobj.frameRate ==0
 end
 sobj.duration = sobj.flipNum*sobj.m_int;% sec
 
+%Screen('CloseAll');
 figUIobj.f1 = figure('Position',[10, 20, 1000, 750], 'Name','None But Air' );
 gui_window3; %loop ÇÕ Ç±ÇÃíÜÇ≈éQè∆ÇµÇƒÇÈ main_looping
 
