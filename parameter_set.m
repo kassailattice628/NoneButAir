@@ -172,10 +172,11 @@ sTrig = daq.createSession(dev.Vendor.ID);
 addDigitalChannel(sTrig, dev.ID, 'port0/line0:1', 'OutputOnly');
 outputSingleScan(sTrig,[0,0]); %reset trigger signals at Low
 %% for Rotary Encoder
-sRot = daq.createSession(dev.Vendor.ID);
-addDigitalChannel(sRot, 'Dev2', 'port0/line3', 'OutputOnly'); %5V 電源の確保
-outputSingleScan(sRot, 1); %reset trigger signals at Low
+sRot5V = daq.createSession(dev.Vendor.ID);
+addDigitalChannel(sRot5V, 'Dev2', 'port0/line3', 'OutputOnly'); %5V 電源の確保
+outputSingleScan(sRot5V, 1); %reset trigger signals at Low
 
+sRot = daq.createSession(dev.Vendor.ID);
 %Counter channel の 生成
 RotCh = addCounterInputChannel(sRot, 'Dev2', 'ctr0', 'Position');
 RotCh.EncoderType='X4'; %デコーディング方式 X1, X2, X4 が選べるが X4 が一番感度が高くなるので
