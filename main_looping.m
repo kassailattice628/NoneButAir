@@ -56,13 +56,17 @@ elseif floop == 1;%Looping
         CounterTest = CounterTest + 1;
 %%%%%%%%%%%%%%%%%%
             %}
+            switch get(figUIobj.RotaryCtr,'value')
+                case 1
+                    startBacground(sRot);
+            end
             startBackground(s);
+            
             %%%%%%%%%%%%%%%%%%%%%%%
             recobj.cycleNum = recobj.cycleNum +1;
             
             if fstim == 1%%visual stimlus ON
                 visual_stimulus;
-                
                 %%% Timinig Mesure %%%
                 recobj.tRec = sobj.vbl_1- recobj.RecStartTime; %Absolute time
                 sobj.tPTBon = sobj.vbl_2 - sobj.vbl_1;
@@ -71,11 +75,8 @@ elseif floop == 1;%Looping
                     sobj.tPTBon2 = sobj.vbl2_2 - sobj.vbl_1;
                     sobj.tPTBoff2 = sobj.vbl2_3 - sobj.vbl_1;
                 end
-                
             elseif fstim == 0%% visual stimulus OFF, Elechtorichal Rec Only
-                %pause(0.001);
                 trigger_AIFV;
-                
                 recobj.tRec = toc(recobj.STARTloop);
                 recobj.TTL2 = 0;
                 sobj.tPTBon = 0;

@@ -10,7 +10,7 @@ global lh
 
 global sRot
 %% NBA version
-recobj.NBAver = 10;
+recobj.NBAver = 10.1;
 
 %% 電気記録と記録サイクル関係
 recobj.interval = 1; %loop interval(s);
@@ -147,8 +147,10 @@ dev = daq.getDevices;
 s = daq.createSession(dev.Vendor.ID);
 
 s.Rate = recobj.sampf;
-s.DurationInSeconds = recobj.rect/1000;%sec %outputchannel いれると なくなる．
-s.NotifyWhenDataAvailableExceeds = recobj.recp;
+%s.DurationInSeconds = recobj.rect/1000;%sec %outputchannel いれると自動で
+%s.scansqued/s.rate に設定される．
+
+%s.NotifyWhenDataAvailableExceeds = recobj.recp;
 
 InCh = addAnalogInputChannel(s, dev.ID, 0:2, 'Voltage');%(1):Vm, (2):Im, (3):photo sensor
 InCh(1).TerminalConfig = 'Differential';%SingleEnded から Differential に変更した．
@@ -171,6 +173,8 @@ stop(s)
 sTrig = daq.createSession(dev.Vendor.ID);
 addDigitalChannel(sTrig, dev.ID, 'port0/line0:1', 'OutputOnly');
 outputSingleScan(sTrig,[0,0]); %reset trigger signals at Low
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% for Rotary Encoder
 sRot5V = daq.createSession(dev.Vendor.ID);
 addDigitalChannel(sRot5V, 'Dev2', 'port0/line3', 'OutputOnly'); %5V 電源の確保
@@ -181,5 +185,9 @@ sRot = daq.createSession(dev.Vendor.ID);
 RotCh = addCounterInputChannel(sRot, 'Dev2', 'ctr0', 'Position');
 RotCh.EncoderType='X4'; %デコーディング方式 X1, X2, X4 が選べるが X4 が一番感度が高くなるので
 addAnalogInputChannel(sRot, 'Dev2', 3, 'Voltage');% AI0:2 は Vm, Im, Photo, AI3 をエンコーダに
-sRot.Rate = 1000;%チャンネルごとに sampling rate かえられるのかな？
-sRot.DurationInSeconds = recobj.rect/1000;
+sRot.Rate = 1000;% s とは別に sampling rate を設定
+sRot.DurationInSeconds = recobj.rect/1000; %ms
+
+% P0.0 is Trigger source, PFI0 is Trigger Destination.これで同時に記録できる？
+addTriggerConnection(sRot,'External',[dev.ID,'/PFI0'],'StartTrigger');
+sRot.Connections(1).TriggerCondition = 'RisingEdge';

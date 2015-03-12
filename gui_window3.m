@@ -119,7 +119,8 @@ figUIobj.ImageNum = uicontrol('style','edit','position',[120 405 40 25],'string'
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%              Visula Stimuli 2             %%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-uipanel('Title','Vis. Stim.2','FontSize',12,'Position',[0.205 0.013 0.195 0.87]);
+%uipanel('Title','Vis. Stim.2','FontSize',12,'Position',[0.205 0.013 0.195 0.87]);
+uipanel('Title','Vis. Stim.2','FontSize',12,'Position',[0.205 0.313 0.195 0.57]);
 
 uicontrol('style','text','position',[210 620 70 15],'string','Stim.Shape2','Horizontalalignment','left');
 figUIobj.shape2=uicontrol('style','popupmenu','position',[210 600 85 20],'string',[{'Rect'},{'Circle'}],'callback','sobj.shape2 = sobj.shapelist{get(figUIobj.shape2,''value''),1};');
@@ -176,10 +177,10 @@ uicontrol('style','text','position',[945 670 20 15],'string','ms','Horizontalali
 
 %%
 uicontrol('style','text','position',[435 650 55 15],'string','Plot Type ','Horizontalalignment','left');
-figUIobj.plot=uicontrol('style','popupmenu','position',[435 630 90 20],'string',[{'V-plot'},{'I-plot'}],'callback','recobj.plot = get(figUIobj.plot, ''value'');ch_plot;daqsetting');
+figUIobj.plot=uicontrol('style','togglebutton','position',[435 625 90 30],'string','V-plot','callback','recobj.plot = get(figUIobj.plot, ''value'');ch_plot;daqsetting');
 
 uicontrol('style','text','position',[530 650 55 15],'string','Y-axis','Horizontalalignment','left');
-figUIobj.yaxis=uicontrol('style','popupmenu','position',[530 630 75 20],'string',[{'Auto'},{'Fix'}],'callback','recobj.yaxis = get(figUIobj.yaxis,''value'');ch_plot');
+figUIobj.yaxis=uicontrol('style','togglebutton','position',[530 625 75 30],'string',[{'Auto'},{'Fix'}],'callback','recobj.yaxis = get(figUIobj.yaxis,''value'');ch_plot');
 
 
 uicontrol('style','text','position',[610 650 80 15],'string','V range (mV)')
@@ -192,7 +193,7 @@ figUIobj.CYmin = uicontrol('style','edit','position',[705 625 40 25],'string',re
 figUIobj.CYmax = uicontrol('style','edit','position',[750 625 40 25],'string',recobj.yrange(4)','callback','recobj.yrange(4) = re_write(figUIobj.CYmax);ch_plot;','BackGroundColor','w');
 
 %%% pulse %%%
-figUIobj.pulse = uicontrol('style','togglebutton','position',[435 585 70 30],'string','Pulse OFF','Callback','pulseset;');
+figUIobj.pulse = uicontrol('style','togglebutton','position',[435 585 70 25],'string','Pulse OFF','Callback','pulseset;');
 %Duration
 uicontrol('style','text','position',[510 610 60 15],'string','Duration','Horizontalalignment','left');
 figUIobj.pulseDuration = uicontrol('style','edit','position',[510 585 50 25],'string',recobj.pulseDuration,'callback','recobj.pulseDuration = re_write(figUIobj.pulseDuration); daqsetting;check_duration2;ch_plot','BackGroundColor','w');
@@ -207,8 +208,9 @@ uicontrol('style','text','position',[640 585 25 15],'string','sec','Horizontalal
 uicontrol('style','text','position',[670 610 90 15],'string','Amplitude','Horizontalalignment','left');
 figUIobj.pulseAmp = uicontrol('style','edit','position',[670 585 50 25],'string',recobj.pulseAmp,'callback','recobj.pulseAmp = re_write(figUIobj.pulseAmp);check_AOrange;daqsetting;','BackGroundColor','w');
 figUIobj.ampunit = uicontrol('style','text','position',[720 585 25 15],'string','nA','Horizontalalignment','left');
-
-
+%%% preset_Testpulse Amplitude%%%
+uicontrol('style','text','position',[740 610 90 15],'string','Preset(V)','Horizontalalignment','left');
+figUIobj.presetAmp = uicontrol('style','togglebutton','position',[740 585 40 25],'string','1 mV','Callback','switch get(figUIobj.plot,''value''), case 1, preset_pulseAmp; end');
 
 %Elech only
 figUIobj.EOf = uicontrol('style','togglebutton','position',[890 700 60 30],'string','E only','Callback','SwitchETrig','FontSize',12,'Horizontalalignment','center');
@@ -238,10 +240,19 @@ figUIobj.Vstep = uicontrol('style','edit','position',[920 595 30 25],'string',re
 uicontrol('string','File Name','position', [435 550 90 30],'Callback','SelectSaveFile;','Horizontalalignment','center');
 figUIobj.savech=uicontrol('style','popupmenu','position', [530 555 120 20],'string',[{'ALL'},{'Header Only'},{'Header&Photo'}]);
 figUIobj.save=uicontrol('style','togglebutton','position', [655 550 70 30],'string','Unsave','Callback','ch_save');
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%              Rotary Encoder            %%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%uipanel('Title','Vis. Stim.1','FontSize',12,'Position',[0.005 0.013 0.195 0.87]);
+uipanel('Title','Rotary.Encoder','FontSize',12,'Position',[0.205 0.013 0.195 0.295]);
 
-ch_DaqRange;
-daqsetting;
+%Rotary Encoder ON/OFF
+figUIobj.RotCtr = uicontrol('style','togglebutton','position',[210 185 85 30],'string','Rotary OFF','Callback','RotarySet','FontSize',12,'Horizontalalignment','center');
 
+%%
+%ch_DaqRange;
+%daqsetting;
+%%
 %%%%%%%%%%%%%%%%%%%   Plot Window   %%%%%%%%%%%%%%%%%%%%
 %場所の指定は subplot の position で指定(0-1.0 の相対値）
 %uicontrol('style','frame','position',[390 30 600 610],'BackGroundColor','w');
