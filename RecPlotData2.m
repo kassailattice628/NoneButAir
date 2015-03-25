@@ -14,6 +14,7 @@ set(figUIobj.s2,'title',text('string', ['V-DATA', '  # = ', num2str(recobj.cycle
 figUIobj.y2 = recobj.dataall(:,recobj.plot);
 figUIobj.y3 = recobj.dataall(:,3);
 figUIobj.t = event.TimeStamps;
+
 refreshdata(figUIobj.p2)
 refreshdata(figUIobj.p3)
 

@@ -26,7 +26,7 @@ sobj.angle = sobj.set_list_img(2,sobj.list_order(i_list));
 
 %画像ファイル名の取得
 imgFolder = ['Imgs',filesep];
-imgFileList = dir([imgFolder '*.tif']);
+imgFileList = dir([imgFolder 'Im*.tif']);
 imgFileName = char(imgFileList(sobj.img_i).name); % 画像のファイル名（フォルダ情報なし）
 imgFileName2 = [imgFolder imgFileName];
 %画像読み込み

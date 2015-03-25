@@ -15,4 +15,6 @@ if get(figUIobj.stepf,'value') == 1
     recobj.OutData = OutData * recobj.stepAmp(i)*recobj.gain(recobj.plot);
 end
 %%%%%
+if s.ScansQueued == 0
 queueOutputData(s,recobj.OutData);
+end

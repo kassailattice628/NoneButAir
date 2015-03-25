@@ -162,7 +162,7 @@ figUIobj.rect=uicontrol('style','edit','position',[515 670 50 25],'string',recob
 uicontrol('style','text','position',[570 670 20 15],'string','ms','Horizontalalignment','left');
 
 uicontrol('style','text','position',[595 695 70 15],'string','Loop Interval','Horizontalalignment','left');
-figUIobj.interval=uicontrol('style','edit','position',[595 670 50 25],'string',recobj.interval,'callback','recobj.interval = re_write(figUIobj.interval);','BackGroundColor','w');
+figUIobj.interval=uicontrol('style','edit','position',[595 670 50 25],'string',recobj.interval,'callback','recobj.interval = re_write(figUIobj.interval);blank_set','BackGroundColor','w');
 uicontrol('style','text','position',[650 670 25 15],'string','sec','Horizontalalignment','left');
 
 uicontrol('style','text','position',[680 695 80 15],'string','Daq Range (V)','Horizontalalignment','left');
@@ -177,7 +177,7 @@ uicontrol('style','text','position',[945 670 20 15],'string','ms','Horizontalali
 
 %%
 uicontrol('style','text','position',[435 650 55 15],'string','Plot Type ','Horizontalalignment','left');
-figUIobj.plot=uicontrol('style','togglebutton','position',[435 625 90 30],'string','V-plot','callback','recobj.plot = get(figUIobj.plot, ''value'');ch_plot;daqsetting');
+figUIobj.plot=uicontrol('style','togglebutton','position',[435 625 90 30],'string','V-plot','callback','recobj.plot = get(figUIobj.plot, ''value'')+1;ch_plot;daqsetting');
 
 uicontrol('style','text','position',[530 650 55 15],'string','Y-axis','Horizontalalignment','left');
 figUIobj.yaxis=uicontrol('style','togglebutton','position',[530 625 75 30],'string',[{'Auto'},{'Fix'}],'callback','recobj.yaxis = get(figUIobj.yaxis,''value'');ch_plot');

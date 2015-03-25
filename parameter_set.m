@@ -8,7 +8,6 @@ global InCh
 global OutCh
 global lh
 
-global sRot
 %% NBA version
 recobj.NBAver = 10.1;
 
@@ -22,7 +21,7 @@ recobj.rectaxis = (0:recobj.sampt/1000:(recobj.recp-1)/recobj.sampf*1000)';%time
 
 
 recobj.plot = 1; %V/I plot, 1: V plot, 2: I plot
-recobj.yaxis = 1;%1: fix y axis, 2: auto
+recobj.yaxis = 0;%0: fix y axis, 1: auto
 recobj.yrange = [-100, 30, -5, 3];%[Vmin, Vmax, Cmin, Cmax]
 
 recobj.prestim = 2; % recobj.prestim * recobj.rect (ms) ‚Í hŒƒ‚È‚µ‚Ì blank loop
@@ -147,10 +146,8 @@ dev = daq.getDevices;
 s = daq.createSession(dev.Vendor.ID);
 
 s.Rate = recobj.sampf;
-%s.DurationInSeconds = recobj.rect/1000;%sec %outputchannel ‚¢‚ê‚é‚Æ©“®‚Å
-%s.scansqued/s.rate ‚Éİ’è‚³‚ê‚éD
-
-%s.NotifyWhenDataAvailableExceeds = recobj.recp;
+s.DurationInSeconds = recobj.rect/1000;%sec %outputchannel ‚¢‚ê‚é‚Æ©“®‚Ås.scansqued/s.rate ‚Éİ’è‚³‚ê‚éD
+s.NotifyWhenDataAvailableExceeds = recobj.recp;
 
 InCh = addAnalogInputChannel(s, dev.ID, 0:2, 'Voltage');%(1):Vm, (2):Im, (3):photo sensor
 InCh(1).TerminalConfig = 'Differential';%SingleEnded ‚©‚ç Differential ‚É•ÏX‚µ‚½D
@@ -166,7 +163,7 @@ OutCh = addAnalogOutputChannel(s, dev.ID, 0:1,'Voltage');
 addTriggerConnection(s,'External',[dev.ID,'/PFI0'],'StartTrigger');
 s.Connections(1).TriggerCondition = 'RisingEdge';
 % generate event listener for Background recording
-lh = addlistener(s, 'DataAvailable', @RecPlotData);
+lh = addlistener(s, 'DataAvailable', @RecPlotData2);
 stop(s)
 
 %% for digital Trigger
@@ -176,6 +173,8 @@ outputSingleScan(sTrig,[0,0]); %reset trigger signals at Low
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% for Rotary Encoder
+%{
+global sRot
 sRot5V = daq.createSession(dev.Vendor.ID);
 addDigitalChannel(sRot5V, 'Dev2', 'port0/line3', 'OutputOnly'); %5V “dŒ¹‚ÌŠm•Û
 outputSingleScan(sRot5V, 1); %reset trigger signals at Low
@@ -187,7 +186,7 @@ RotCh.EncoderType='X4'; %ƒfƒR[ƒfƒBƒ“ƒO•û® X1, X2, X4 ‚ª‘I‚×‚é‚ª X4 ‚ªˆê”ÔŠ´“x‚
 addAnalogInputChannel(sRot, 'Dev2', 3, 'Voltage');% AI0:2 ‚Í Vm, Im, Photo, AI3 ‚ğƒGƒ“ƒR[ƒ_‚É
 sRot.Rate = 1000;% s ‚Æ‚Í•Ê‚É sampling rate ‚ğİ’è
 sRot.DurationInSeconds = recobj.rect/1000; %ms
-
 % P0.0 is Trigger source, PFI0 is Trigger Destination.‚±‚ê‚Å“¯‚É‹L˜^‚Å‚«‚éH
 addTriggerConnection(sRot,'External',[dev.ID,'/PFI0'],'StartTrigger');
 sRot.Connections(1).TriggerCondition = 'RisingEdge';
+%}

@@ -3,7 +3,7 @@ global recobj
 global figUIobj
 
 switch recobj.plot
-    case 0%V-plot
+    case 1%V-plot
         set(figUIobj.plot,'string','V-plot','BackgroundColor','B');
         %plot
         set(get(figUIobj.s2, 'Title'), 'string','V-DATA');
@@ -12,7 +12,7 @@ switch recobj.plot
         %C-pulse
         set(figUIobj.ampunit,'string','nA');
         
-    case 1%C-plot
+    case 2%C-plot
         set(figUIobj.plot,'string','I-plot','BackgroundColor','R');
         %plot
         set(get(figUIobj.s2, 'Title'), 'string','I-DATA');
@@ -38,13 +38,11 @@ switch recobj.yaxis
         set(figUIobj.s2,'Ylim',[recobj.yrange(recobj.plot*2-1),recobj.yrange(recobj.plot*2)]);
         switch recobj.plot
             case 1
-                
                 set(figUIobj.VYmax,'BackGroundColor','g')
                 set(figUIobj.VYmin,'BackGroundColor','g')
                 set(figUIobj.CYmax,'BackGroundColor','w')
                 set(figUIobj.CYmin,'BackGroundColor','w')
             case 2
-                
                 set(figUIobj.VYmax,'BackGroundColor','w')
                 set(figUIobj.VYmin,'BackGroundColor','w')
                 set(figUIobj.CYmax,'BackGroundColor','g')

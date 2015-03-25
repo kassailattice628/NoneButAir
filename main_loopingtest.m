@@ -30,7 +30,9 @@ elseif floop == 1;%Looping
             %%%%%%%%%%%%%%%%%%
             prepAOdata;%AO data 2ch を準備して queue
             %%%%%
+            
             startBackground(s); %wait trigger for recording
+            %outputSingleScan(sTrig,[1,1])
             %%%%%%%%%%%%%%%%%%%%%%%
             if fstim == 1%visual stim ON
                 visual_stimulus;
@@ -59,7 +61,9 @@ elseif floop == 1;%Looping
             %%%%%  data get   %%%%%
             %%%%%%%%%%%%%%%%%
             % data は RecPlotData の中で recobj.dataall に入るようになってる
-            s.wait(recobj.rect*2/1000);%wait(sec) か data 取り終わるまでストップ
+            % savedata を作る前に interval とる必要あり（？）
+            s.wait(recobj.rect/1000 +1);
+            %wait(s,recobj.rect/1000);
             drawnow update
             %%%%%%%%%%%%%%%%%
             %%%%%  set save data  %%%%%

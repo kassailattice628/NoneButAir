@@ -42,7 +42,7 @@ elseif  fmode ==2 %fixed position
 
 
 elseif fmode==3% oredered
-    set(figUIobj.fixpos, 'BackGroundColor','y');
+    set(figUIobj.fixpos, 'BackGroundColor','w');
     sobj.poslist = stimset;
     for m = 1:length(stimset)
         [stimset_x(m),stimset_y(m)] = find(stimset_mat== stimset(m));
